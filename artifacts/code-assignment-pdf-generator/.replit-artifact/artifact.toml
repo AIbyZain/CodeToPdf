@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Code Assignment PDF Generator"
+description = "A responsive web app that helps students upload source-code files, review deterministic question groupings, render readable code pages, and download an academic PDF assignment."
+version = "1.0.0"
+id = "artifacts/code-assignment-pdf-generator"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26198
+
+[services.development]
+run = "pnpm --filter @workspace/code-assignment-pdf-generator run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/code-assignment-pdf-generator", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/code-assignment-pdf-generator/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26198"
+BASE_PATH = "/"
