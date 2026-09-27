@@ -1,0 +1,11 @@
+/* Styles for question 1
+   multi-line comment */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f4f4;
+  margin: 0 auto;
+}
+#top .banner:hover {
+  color: #1a73e8; /* brand blue */
+  padding: 4px 12.5em;
+}

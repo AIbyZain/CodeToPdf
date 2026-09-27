@@ -1,0 +1,238 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: assignments
+    description: Assignment analysis and PDF generation
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /assignments/analyze:
+    post:
+      operationId: analyzeAssignment
+      tags: [assignments]
+      summary: Detect question groupings for uploaded source files
+      description: Deterministically detects file types and likely question numbers from source filenames.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignmentAnalysisInput"
+      responses:
+        "200":
+          description: Detected file groupings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignmentAnalysis"
+        "400":
+          description: Invalid assignment or unsupported files
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assignments/generate-pdf:
+    post:
+      operationId: generateAssignmentPdf
+      tags: [assignments]
+      summary: Generate a readable academic PDF from grouped source files
+      description: Files are rendered in the order given within each question. Optional settings control page size, code font size, line numbers, syntax highlighting and the cover page.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignmentPdfInput"
+      responses:
+        "200":
+          description: Generated assignment PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid assignment or unsupported files
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    AssignmentInfo:
+      type: object
+      properties:
+        title:
+          type: string
+        studentName:
+          type: string
+        rollNumber:
+          type: string
+        courseName:
+          type: string
+        instructorName:
+          type: string
+        semester:
+          type: string
+        section:
+          type: string
+        date:
+          type: string
+      required:
+        - title
+        - studentName
+        - rollNumber
+        - courseName
+        - instructorName
+    SourceFile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        content:
+          type: string
+        size:
+          type: integer
+          minimum: 0
+      required:
+        - id
+        - name
+        - content
+        - size
+    GroupedFile:
+      allOf:
+        - $ref: "#/components/schemas/SourceFile"
+        - type: object
+          properties:
+            detectedQuestion:
+              type: ["integer", "null"]
+            detectedType:
+              type: string
+            confidence:
+              type: string
+              enum: [high, medium, low]
+          required:
+            - detectedQuestion
+            - detectedType
+            - confidence
+    AssignmentAnalysisInput:
+      type: object
+      properties:
+        assignment:
+          $ref: "#/components/schemas/AssignmentInfo"
+        files:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/SourceFile"
+      required:
+        - assignment
+        - files
+    QuestionGroup:
+      type: object
+      properties:
+        questionNumber:
+          type: integer
+          minimum: 1
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupedFile"
+      required:
+        - questionNumber
+        - files
+    AssignmentAnalysis:
+      type: object
+      properties:
+        assignment:
+          $ref: "#/components/schemas/AssignmentInfo"
+        groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionGroup"
+        ungrouped:
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupedFile"
+        supportedExtensions:
+          type: array
+          items:
+            type: string
+      required:
+        - assignment
+        - groups
+        - ungrouped
+        - supportedExtensions
+    PdfSettings:
+      type: object
+      properties:
+        pageSize:
+          type: string
+          enum: [A4, Letter]
+        fontSize:
+          type: string
+          enum: [small, medium, large]
+        lineNumbers:
+          type: boolean
+        syntaxHighlighting:
+          type: boolean
+        coverPage:
+          type: boolean
+      required:
+        - pageSize
+        - fontSize
+        - lineNumbers
+        - syntaxHighlighting
+        - coverPage
+    AssignmentPdfInput:
+      type: object
+      properties:
+        assignment:
+          $ref: "#/components/schemas/AssignmentInfo"
+        groups:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/QuestionGroup"
+        settings:
+          $ref: "#/components/schemas/PdfSettings"
+      required:
+        - assignment
+        - groups
+

@@ -1,0 +1,305 @@
+Build the first working MVP of a web application called "Code Assignment PDF Generator".
+
+IMPORTANT:
+
+* This is a real implementation task.
+* Work directly inside the Replit project.
+* Keep the implementation simple and cost-efficient.
+* Do NOT over-engineer.
+* Do NOT add unnecessary AI APIs or paid services.
+* The application should work primarily through deterministic code/file processing.
+* Use a clean, modular architecture so additional features can be added later.
+
+## CORE PROBLEM
+
+A student creates a programming assignment containing multiple files.
+
+Example:
+
+Question 1:
+
+* question1.html
+* question1.css
+
+Question 2:
+
+* question2.html
+* question2.css
+
+Question 3:
+
+* question3.html
+* question3.css
+
+Question 4:
+
+* question4.html
+* question4.css
+
+Question 5:
+
+* question5.html
+* question5.css
+
+The student currently has to take screenshots of every file manually and paste them into a Word document before exporting to PDF.
+
+This application should automate that process.
+
+## CORE WORKFLOW
+
+The user should be able to:
+
+1. Create a new assignment.
+2. Enter basic assignment information:
+
+   * Assignment title
+   * Student name
+   * Roll number
+   * Course name
+   * Instructor name
+3. Upload multiple source-code files.
+4. The application should detect the uploaded files and organize them.
+5. The user should be able to confirm/edit the detected question grouping.
+6. Generate a PDF.
+7. Download the generated PDF.
+
+## FILE GROUPING
+
+The uploaded files may have names such as:
+
+question1.html
+question1.css
+question2.html
+question2.css
+
+OR:
+
+q1.html
+q1.css
+q2.html
+q2.css
+
+OR:
+
+Q1_HTML.html
+Q1_CSS.css
+
+The system should attempt to determine the question number from the filename.
+
+However, NEVER silently make dangerous assumptions.
+
+If the grouping is uncertain, show the user the detected grouping and allow them to correct it before generating the PDF.
+
+The UI should show something like:
+
+Question 1
+├── question1.html
+└── question1.css
+
+Question 2
+├── question2.html
+└── question2.css
+
+...
+
+Question 5
+├── question5.html
+└── question5.css
+
+Allow the user to move files between questions if necessary.
+
+## SCREENSHOT GENERATION
+
+The most important feature:
+
+The application must convert each source file into a visual screenshot-like image for the PDF.
+
+Do NOT simply place raw code as plain PDF text.
+
+The PDF should visually resemble a screenshot of the code editor.
+
+For example:
+
+Question 1
+
+HTML — question1.html
+
+┌─────────────────────────────────────┐
+│  1 │ <!DOCTYPE html>                │
+│  2 │ <html>                         │
+│  3 │ ...                            │
+│  4 │ ...                            │
+└─────────────────────────────────────┘
+
+CSS — question1.css
+
+┌─────────────────────────────────────┐
+│  1 │ body {                         │
+│  2 │   margin: 0;                   │
+│  3 │   ...                           │
+└─────────────────────────────────────┘
+
+If a file is too long for one page, automatically split it across multiple pages.
+
+Never shrink the code so much that it becomes unreadable.
+
+## PDF ORDER
+
+The generated PDF must follow this exact logical order:
+
+Cover/basic information
+
+Question 1
+HTML file screenshots
+CSS file screenshots
+other Question 1 files
+
+Question 2
+HTML file screenshots
+CSS file screenshots
+other Question 2 files
+
+Question 3
+...
+
+Question 4
+...
+
+Question 5
+...
+
+The order of files within each question should preferably be:
+
+HTML
+CSS
+JavaScript
+Other files
+
+If the user uploaded a different structure, preserve the user's file order when possible.
+
+## PDF DESIGN
+
+Keep the PDF simple and academic.
+
+Do NOT create a flashy marketing-style PDF.
+
+Use:
+
+* White background
+* Clean headings
+* Question number clearly visible
+* File name clearly visible
+* Monospace code font
+* Line numbers
+* Syntax highlighting where practical
+* Page numbers
+* Reasonable margins
+* Readable font size
+* Consistent spacing
+
+Each code page should clearly identify:
+
+Question 1
+File: question1.html
+Page X
+
+## SUPPORTED FILES
+
+Initially support:
+
+* HTML
+* CSS
+* JavaScript
+* Python
+* Java
+* C
+* C++
+* JSON
+* XML
+* TXT
+
+Reject unsupported/binary files gracefully.
+
+## FRONTEND
+
+Create a simple responsive interface.
+
+Main flow:
+
+Landing/Create Assignment
+↓
+Assignment Information
+↓
+Upload Files
+↓
+Review File Groups
+↓
+Generate PDF
+↓
+PDF Preview / Download
+
+The interface should be functional before visual polish.
+
+## BACKEND
+
+Implement a lightweight backend that:
+
+* receives uploaded files
+* validates them
+* determines file type
+* detects question grouping
+* prepares code rendering
+* generates the PDF
+* returns the generated PDF
+
+Use a reliable PDF generation approach available in the Replit environment.
+
+For code rendering, use an existing syntax-highlighting/rendering library where practical instead of implementing a syntax highlighter from scratch.
+
+## IMPORTANT IMPLEMENTATION RULES
+
+Do NOT use an external AI API for the core functionality.
+
+The file grouping should initially be deterministic.
+
+Do NOT add authentication.
+
+Do NOT add a database unless genuinely necessary.
+
+Do NOT add payments.
+
+Do NOT add unnecessary cloud storage.
+
+Do NOT add unnecessary dependencies.
+
+The first milestone is simply:
+
+UPLOAD FILES → GROUP FILES → RENDER CODE → GENERATE PDF → DOWNLOAD
+
+## TESTING
+
+Create a test/sample assignment with:
+
+question1.html
+question1.css
+question2.html
+question2.css
+question3.html
+question3.css
+
+Also test at least one long file that requires multiple PDF pages.
+
+Make sure:
+
+* files upload correctly
+* grouping works
+* grouping can be manually corrected
+* code is readable
+* long files split correctly
+* PDF order is correct
+* generated PDF opens correctly
+* download works
+
+After implementation, run the application and verify the complete workflow.
+
+Do not stop at creating the UI. The PDF generation must actually work.
